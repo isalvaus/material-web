@@ -4,14 +4,14 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {animate, fadeIn, fadeOut} from '@lit-labs/motion';
-import {EASING} from '@material/web/internal/motion/animation.js';
-import {LitElement, PropertyValues, css, html, nothing} from 'lit';
-import {customElement, property, state} from 'lit/decorators.js';
+import { animate, fadeIn, fadeOut } from '@lit-labs/motion';
+import { EASING } from '@material/web/internal/motion/animation.js';
+import { LitElement, PropertyValues, css, html, nothing } from 'lit';
+import { customElement, property, state } from 'lit/decorators.js';
 
-import {drawerOpenSignal} from '../signals/drawer-open-state.js';
-import {inertContentSignal, inertSidebarSignal} from '../signals/inert.js';
-import {SignalElement} from '../signals/signal-element.js';
+import { drawerOpenSignal } from '../signals/drawer-open-state.js';
+import { inertContentSignal, inertSidebarSignal } from '../signals/inert.js';
+import { SignalElement } from '../signals/signal-element.js';
 
 /**
  * A layout element that positions the top-app-bar, the main page content, and
@@ -31,9 +31,15 @@ export class NavDrawer extends SignalElement(LitElement) {
   /**
    * Whether or not the TOC should be rendered.
    */
-  @property({type: Boolean, attribute: 'has-toc'}) hasToc = false;
+  @property({ type: Boolean, attribute: 'has-toc' }) hasToc = false;
 
-  @property({attribute: 'page-title'}) pageTitle = '';
+  /**
+   * Whether or not the content should be full height. rather than scrollable.
+   */
+  @property({ type: Boolean, attribute: 'full-height-content', reflect: true })
+  fullHeightContent = false;
+
+  @property({ attribute: 'page-title' }) pageTitle = '';
 
   private lastDrawerOpen = drawerOpenSignal.value;
 
@@ -66,7 +72,8 @@ export class NavDrawer extends SignalElement(LitElement) {
                     },
                     in: fadeIn,
                     out: fadeOut,
-                  })}></div>`
+                  })}
+                ></div>`
               : nothing}
             <aside
               ?inert=${this.isCollapsible && !drawerOpenSignal.value}
@@ -76,7 +83,8 @@ export class NavDrawer extends SignalElement(LitElement) {
                   duration: drawerSlideAnimationDuration,
                   easing: drawerSlideAnimationEasing,
                 },
-              })}>
+              })}
+            >
               <div class="scroll-wrapper">
                 <slot
                   ${animate({
@@ -85,7 +93,8 @@ export class NavDrawer extends SignalElement(LitElement) {
                       duration: drawerContentOpacityDuration,
                       easing: 'linear',
                     },
-                  })}></slot>
+                  })}
+                ></slot>
               </div>
             </aside>
           </div>
@@ -100,7 +109,8 @@ export class NavDrawer extends SignalElement(LitElement) {
   private renderContent(showModal: boolean) {
     return html` <div
       class="pane content-pane"
-      ?inert=${showModal || inertContentSignal.value}>
+      ?inert=${showModal || inertContentSignal.value}
+    >
       <div class="scroll-wrapper">
         <div class="content">
           <slot name="app-content"></slot>
@@ -116,7 +126,8 @@ export class NavDrawer extends SignalElement(LitElement) {
 
     return html` <div
       class="pane toc"
-      ?inert=${showModal || inertContentSignal.value}>
+      ?inert=${showModal || inertContentSignal.value}
+    >
       <div class="scroll-wrapper">
         <p>On this page:</p>
         <h2>${this.pageTitle}</h2>
@@ -151,7 +162,7 @@ export class NavDrawer extends SignalElement(LitElement) {
     ) {
       (
         this.querySelector(
-          'md-list.nav md-list-item[tabindex="0"]',
+          'md-list.nav md-list-item[tabindex="0"]'
         ) as HTMLElement
       )?.focus();
     }
@@ -278,6 +289,13 @@ export class NavDrawer extends SignalElement(LitElement) {
       max-height: 100%;
       border-radius: inherit;
       box-sizing: border-box;
+    }
+
+    :host([full-height-content]) .scroll-wrapper,
+    :host([full-height-content]) .content,
+    .content ::slotted(*) {
+      height: 100%;
+      max-height: 100%;
     }
 
     .pane .scroll-wrapper {

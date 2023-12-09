@@ -1,0 +1,68 @@
+---js
+{
+  pagination: {
+    data: "collections.component",
+    size: 1,
+    alias: "component",
+    before: components => {
+      // remove any components that don't have a dirname
+      return components.filter(component => component.data.dirname)
+    }
+  },
+  permalink: "components/{{component.data.page.fileSlug}}/stories/index.html",
+  fullHeightContent: "true",
+  collections: ["stories"],
+  eleventyComputed: {
+    dirname: ({component}) => component.data.dirname,
+    name: ({component}) => component.data.name,
+    tabUrl: ({component}) => component.data.page.url,
+  }
+}
+---
+
+{% extends 'default.html' %} {% block head %}
+<script type="module" src="/js/pages/components.js"></script>
+<script type="module" src="/js/pages/stories.js"></script>
+<script
+  type="module"
+  src="/js/hydration-entrypoints/playground-elements.js"
+></script>
+<link rel="stylesheet" href="/css/md-layout.css" />
+<link rel="stylesheet" href="/css/syntax-highlight.css" />
+<style>
+  #dragbar {
+    max-width: 100%;
+  }
+  #editor {
+    margin-block: 0;
+    height: 100%;
+    box-sizing: border-box;
+  }
+  #editor-wrapper {
+    height: 100%;
+    overflow: hidden;
+  }
+</style>
+{% endblock %} {% block content %}
+<playground-project
+  id="project"
+  project-src="/assets/stories/{{dirname}}/project.json"
+>
+</playground-project>
+<drag-playground id="dragbar">
+  <playground-preview id="preview" project="project" slot="preview">
+    <md-circular-progress indeterminate></md-circular-progress>
+  </playground-preview>
+  <div slot="editor" id="editor-wrapper">
+    <playground-file-editor
+      id="editor"
+      project="project"
+      filename="stories.ts"
+      line-numbers
+      aria-hidden="true"
+    >
+      <md-circular-progress indeterminate></md-circular-progress>
+    </playground-file-editor>
+  </div>
+</drag-playground>
+{% endblock %}
