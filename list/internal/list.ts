@@ -5,10 +5,11 @@
  */
 
 import {html, isServer, LitElement} from 'lit';
-import {queryAssignedElements} from 'lit/decorators.js';
+import {property,queryAssignedElements} from 'lit/decorators.js';
 
 import {ListController, NavigableKeys} from './list-controller.js';
 import {ListItem as SharedListItem} from './list-navigation-helpers.js';
+import { Item } from '@material/web/labs/item/internal/item.js';
 
 const NAVIGABLE_KEY_SET = new Set<string>(Object.values(NavigableKeys));
 
@@ -17,7 +18,7 @@ interface ListItem extends SharedListItem {
 }
 
 // tslint:disable-next-line:enforce-comments-on-exported-symbols
-export class List extends LitElement {
+export class List<ItemType> extends LitElement {
   /**
    * An array of activatable and disableable list items. Queries every assigned
    * element that has the `md-list-item` attribute.
@@ -28,6 +29,13 @@ export class List extends LitElement {
    */
   @queryAssignedElements({flatten: true})
   protected slotItems!: Array<ListItem | (HTMLElement & {item?: ListItem})>;
+
+  // Data to be rendered
+  @property({type: Array})
+  data:Array<ItemType>;
+
+  // Function to convert data to list items
+  itemToListItem: (item: ItemType) => ListItem;
 
   /** @export */
   get items() {
@@ -53,21 +61,22 @@ export class List extends LitElement {
     // Cast needed for closure
     (this as HTMLElement).attachInternals();
 
-  constructor() {
+  constructor(data: Array<ItemType>,  itemToListItem: (item: ItemType) => ListItem) {
     super();
+
+    this.data = data;
+    this.itemToListItem = itemToListItem;
+
     if (!isServer) {
       this.internals.role = 'list';
       this.addEventListener('keydown', this.listController.handleKeydown);
     }
   }
 
+
   protected override render() {
     return html`
-      <slot
-        @deactivate-items=${this.listController.onDeactivateItems}
-        @request-activation=${this.listController.onRequestActivation}
-        @slotchange=${this.listController.onSlotchange}>
-      </slot>
+      ${this.data.map((item) => this.itemToListItem(item))}
     `;
   }
 
