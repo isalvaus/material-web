@@ -88,8 +88,10 @@ export class List<ItemType> extends LitElement {
       let strings = ((template !== null) ? 
                       [...template.strings, ...listItemTemplate.strings] :
                       listItemTemplate.strings);
-
-      console.log(strings.hasOwnProperty('raw'));
+      if (strings.hasOwnProperty('raw')){
+        console.log(strings.hasOwnProperty('raw'));
+      }
+      
 
       return {
         ['_$litType$']: 1,
