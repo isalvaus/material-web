@@ -1,6 +1,6 @@
 {
   "name": "@isalvaus/mwc",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "publishConfig": {
     "access": "public"
   },
@@ -38,7 +38,6 @@
   "module": "./common.js",
   "types": "./common.d.ts",
   "exports": "./index.js",
-  
   "files": [
     "**/*.js",
     "**/*.js.map",
@@ -72,7 +71,6 @@
     "web-test-runner-jasmine": "^0.0.2",
     "wireit": "^0.13.0"
   },
-  
   "wireit": {
     "build": {
       "dependencies": [
