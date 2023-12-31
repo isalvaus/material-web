@@ -89,7 +89,7 @@ export class List<ItemType> extends LitElement {
                       [...template.strings, ...listItemTemplate.strings] :
                       listItemTemplate.strings);
       if (strings.hasOwnProperty('raw')){
-        console.log(strings.hasOwnProperty('raw'));
+        console.log(Array.isArray(strings), strings.hasOwnProperty('raw'));
       }
       
 
