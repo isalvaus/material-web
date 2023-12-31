@@ -11,7 +11,7 @@ import {styles} from './internal/list-styles.css.js';
 
 declare global {
   interface HTMLElementTagNameMap {
-    'md-list': MdList;
+    'md-list': MdList<String>;
   }
 }
 
@@ -35,6 +35,6 @@ declare global {
  * @suppress {visibility}
  */
 @customElement('md-list')
-export class MdList extends List {
+export class MdList<ItemType> extends List<ItemType>{
   static override styles = [styles];
 }

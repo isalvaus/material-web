@@ -4,18 +4,24 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {html, isServer, LitElement} from 'lit';
+import {isServer, LitElement, TemplateResult} from 'lit';
 import {property,queryAssignedElements} from 'lit/decorators.js';
 
 import {ListController, NavigableKeys} from './list-controller.js';
 import {ListItem as SharedListItem} from './list-navigation-helpers.js';
-import { Item } from '@material/web/labs/item/internal/item.js';
+//import { Item } from '@material/web/labs/item/internal/item.js';
 
 const NAVIGABLE_KEY_SET = new Set<string>(Object.values(NavigableKeys));
+
 
 interface ListItem extends SharedListItem {
   type: 'text' | 'button' | 'link';
 }
+
+export function template(strings: TemplateStringsArray, ...values: unknown[]): [TemplateStringsArray, ...unknown[]] {
+  return [strings, ...values];
+}
+
 
 // tslint:disable-next-line:enforce-comments-on-exported-symbols
 export class List<ItemType> extends LitElement {
@@ -34,9 +40,9 @@ export class List<ItemType> extends LitElement {
   @property({type: Array})
   data:Array<ItemType>;
 
-  // Function to convert data to list items
-  itemToListItem: (item: ItemType) => ListItem;
+  itemToListItem: (item: ItemType) => TemplateResult<1> 
 
+ 
   /** @export */
   get items() {
     return this.listController.items;
@@ -61,25 +67,49 @@ export class List<ItemType> extends LitElement {
     // Cast needed for closure
     (this as HTMLElement).attachInternals();
 
-  constructor(data: Array<ItemType>,  itemToListItem: (item: ItemType) => ListItem) {
+  constructor(data: Array<ItemType>, itemToListItem: (item: ItemType) => TemplateResult<1>) {
     super();
 
     this.data = data;
     this.itemToListItem = itemToListItem;
+    
 
     if (!isServer) {
       this.internals.role = 'list';
       this.addEventListener('keydown', this.listController.handleKeydown);
     }
   }
+  
+  
 
+  protected override render() { 
+    return this.data.reduce<TemplateResult<1>>((template, item) => {
+      var listItemTemplate = this.itemToListItem(item);
+      let strings = ((template !== null) ? 
+                      [...template.strings, ...listItemTemplate.strings] :
+                      listItemTemplate.strings);
 
-  protected override render() {
-    return html`
-      ${this.data.map((item) => this.itemToListItem(item))}
-    `;
+      console.log(strings.hasOwnProperty('raw'));
+
+      return {
+        ['_$litType$']: 1,
+        strings: strings  as unknown as TemplateStringsArray,
+
+        values: ((template !== null) ? 
+          template.values.concat(listItemTemplate.values) :
+          listItemTemplate.values) 
+      }
+  },null);
+      
+
+    /*html``
+      for(var item of this.data){
+        template =  + `<md-list-item>${item}</md-list-item>`;
+      }
+    return html`${this.data.map((item) => this.itemToListItem(item))}`;*/
   }
 
+  
   /**
    * Activates the next item in the list. If at the end of the list, the first
    * item will be activated.

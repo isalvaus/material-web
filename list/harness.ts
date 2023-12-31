@@ -29,13 +29,13 @@ export type HandledListKeys =
 /**
  * Test harness for list.
  */
-export class ListHarness extends Harness<List> {
+export class ListHarness extends Harness<List<String>> {
   /**
    * Returns the first list item element.
    */
   protected override async getInteractiveElement() {
     await this.element.updateComplete;
-    return this.element as List;
+    return this.element as List<String>;
   }
 
   /** @return List item harnesses. */
