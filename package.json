@@ -2,7 +2,8 @@
   "name": "@isalvaus/mwc",
   "version": "1.0.9",
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "registry": "https://npm.pkg.github.com"
   },
   "description": "Material web components with data binding",
   "keywords": [
