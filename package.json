@@ -1,6 +1,6 @@
 {
   "name": "@isalvaus/mwc",
-  "version": "1.0.10",
+  "version": "1.0.1",
   "publishConfig": {
     "access": "public",
     "registry": "https://npm.pkg.github.com"
@@ -35,10 +35,10 @@
     "update-docs": "wireit"
   },
   "type": "module",
-  "main": "./index.js",
+  "main": "./common.js",
   "module": "./common.js",
   "types": "./common.d.ts",
-  "exports": "./index.js",
+  
   "files": [
     "**/*.js",
     "**/*.js.map",

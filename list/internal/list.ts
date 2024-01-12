@@ -4,12 +4,13 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {isServer, LitElement, TemplateResult} from 'lit';
-import {property,queryAssignedElements} from 'lit/decorators.js';
+import {isServer, html, TemplateResult} from 'lit';
+import {queryAssignedElements} from 'lit/decorators.js';
+import { repeat } from 'lit/directives/repeat.js';
 
 import {ListController, NavigableKeys} from './list-controller.js';
 import {ListItem as SharedListItem} from './list-navigation-helpers.js';
-//import { Item } from '@material/web/labs/item/internal/item.js';
+import { BindableCollectionElement } from '../../BindableCollectionElement.js';
 
 const NAVIGABLE_KEY_SET = new Set<string>(Object.values(NavigableKeys));
 
@@ -24,7 +25,7 @@ export function template(strings: TemplateStringsArray, ...values: unknown[]): [
 
 
 // tslint:disable-next-line:enforce-comments-on-exported-symbols
-export class List<ItemType> extends LitElement {
+export class List<ItemType> extends BindableCollectionElement<ItemType> {
   /**
    * An array of activatable and disableable list items. Queries every assigned
    * element that has the `md-list-item` attribute.
@@ -35,13 +36,7 @@ export class List<ItemType> extends LitElement {
    */
   @queryAssignedElements({flatten: true})
   protected slotItems!: Array<ListItem | (HTMLElement & {item?: ListItem})>;
-
-  // Data to be rendered
-  @property({type: Array})
-  data:Array<ItemType>;
-
-  itemToListItem: (item: ItemType) => TemplateResult<1> 
-
+  
  
   /** @export */
   get items() {
@@ -68,11 +63,7 @@ export class List<ItemType> extends LitElement {
     (this as HTMLElement).attachInternals();
 
   constructor(data: Array<ItemType>, itemToListItem: (item: ItemType) => TemplateResult<1>) {
-    super();
-
-    this.data = data;
-    this.itemToListItem = itemToListItem;
-    
+    super(data, itemToListItem);
 
     if (!isServer) {
       this.internals.role = 'list';
@@ -82,7 +73,7 @@ export class List<ItemType> extends LitElement {
   
   
 
-  protected override render() { 
+/*  protected override render() { 
     return this.data.reduce<TemplateResult<1>>((template, item) => {
       var listItemTemplate = this.itemToListItem(item);
       let strings = ((template !== null) ? 
@@ -101,15 +92,17 @@ export class List<ItemType> extends LitElement {
           template.values.concat(listItemTemplate.values) :
           listItemTemplate.values) 
       }
-  },null);
-      
+  },null);*/
 
-    /*html``
-      for(var item of this.data){
-        template =  + `<md-list-item>${item}</md-list-item>`;
-      }
-    return html`${this.data.map((item) => this.itemToListItem(item))}`;*/
+  protected override render() { 
+    return html`      
+      <slot @deactivate-items=${this.listController.onDeactivateItems}
+            @request-activation=${this.listController.onRequestActivation}
+            @slotchange=${this.listController.onSlotchange}>
+            ${repeat(this.data, (item, index) => this.itemToListItem(item))}
+      </slot>`;
   }
+        
 
   
   /**

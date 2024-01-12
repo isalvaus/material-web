@@ -1,0 +1,25 @@
+{
+  "env": [
+    "browser",
+    "development",
+    "module"
+  ],
+  "imports": {
+    "lit": "https://ga.jspm.io/npm:lit@3.1.0/index.js",
+    "lit/decorators.js": "https://ga.jspm.io/npm:lit@3.1.0/decorators.js",
+    "lit/directives/class-map.js": "https://ga.jspm.io/npm:lit@3.1.0/directives/class-map.js",
+    "lit/directives/live.js": "https://ga.jspm.io/npm:lit@3.1.0/directives/live.js",
+    "lit/directives/style-map.js": "https://ga.jspm.io/npm:lit@3.1.0/directives/style-map.js",
+    "lit/static-html.js": "https://ga.jspm.io/npm:lit@3.1.0/static-html.js",
+    "tslib": "https://ga.jspm.io/npm:tslib@2.6.2/tslib.es6.mjs"
+  },
+  "scopes": {
+    "https://ga.jspm.io/": {
+      "@lit/reactive-element": "https://ga.jspm.io/npm:@lit/reactive-element@2.0.2/development/reactive-element.js",
+      "@lit/reactive-element/decorators/": "https://ga.jspm.io/npm:@lit/reactive-element@2.0.2/development/decorators/",
+      "lit-element/lit-element.js": "https://ga.jspm.io/npm:lit-element@4.0.2/development/lit-element.js",
+      "lit-html": "https://ga.jspm.io/npm:lit-html@3.1.0/development/lit-html.js",
+      "lit-html/": "https://ga.jspm.io/npm:lit-html@3.1.0/development/"
+    }
+  }
+}

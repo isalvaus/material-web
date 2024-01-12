@@ -6,7 +6,7 @@
 
 import '../../menu/menu.js';
 
-import {html, isServer, LitElement, nothing, PropertyValues} from 'lit';
+import {html, isServer, LitElement, TemplateResult, nothing, PropertyValues} from 'lit';
 import {property, query, queryAssignedElements, state} from 'lit/decorators.js';
 import {ClassInfo, classMap} from 'lit/directives/class-map.js';
 import {styleMap} from 'lit/directives/style-map.js';
@@ -14,7 +14,7 @@ import {html as staticHtml, StaticValue} from 'lit/static-html.js';
 
 import {Field} from '../../field/internal/field.js';
 import {ARIAMixinStrict} from '../../internal/aria/aria.js';
-import {requestUpdateOnAriaChange} from '../../internal/aria/delegate.js';
+//import {requestUpdateOnAriaChange} from '../../internal/aria/delegate.js';
 import {redispatchEvent} from '../../internal/controller/events.js';
 import {
   createValidator,
@@ -45,6 +45,7 @@ import {
   SelectOption,
 } from './selectoption/selectOptionController.js';
 import {getSelectedItems, SelectOptionRecord} from './shared.js';
+import { repeat } from 'lit/directives/repeat.js';
 
 
 const VALUE = Symbol('value');
@@ -70,9 +71,9 @@ const selectBaseClass = mixinOnReportValidity(
  * @fires closed {Event} Fired when the select's menu has finished animations
  * and closed.
  */
-export abstract class Select extends selectBaseClass {
+export abstract class BindableSelect<ItemType> extends selectBaseClass {
   static {
-    requestUpdateOnAriaChange(Select);
+    //requestUpdateOnAriaChange(BindableSelect);
   }
 
   /** @nocollapse */
@@ -253,8 +254,20 @@ export abstract class Select extends selectBaseClass {
   private prevOpen = this.open;
   private selectWidth = 0;
 
-  constructor() {
+    // Data to be rendered
+    @property({type: Array})
+    data:Array<ItemType>;
+  
+    // Function to convert data to list items
+    itemToListItem: (item: ItemType) => TemplateResult<1>;
+  
+  constructor(displayText: string, data: Array<ItemType>, itemToListItem: (item: ItemType) => TemplateResult<1>) {
     super();
+    
+    this.data = data;
+    this.itemToListItem = itemToListItem;
+    this.displayText = displayText;
+
     if (isServer) {
       return;
     }
@@ -321,7 +334,7 @@ export abstract class Select extends selectBaseClass {
     }
   }
 
-  protected override update(changed: PropertyValues<Select>) {
+  protected override update(changed: PropertyValues<BindableSelect<ItemType>>) {
     // In SSR the options will be ready to query, so try to figure out what
     // the value and display text should be.
     if (!this.hasUpdated) {
@@ -347,12 +360,13 @@ export abstract class Select extends selectBaseClass {
       <span
         class="select ${classMap(this.getRenderClasses())}"
         @focusout=${this.handleFocusout}>
-        ${this.renderField()} ${this.renderMenu()}
+        ${this.renderField()} 
+        ${this.renderMenu()}
       </span>
     `;
   }
 
-  protected override async firstUpdated(changed: PropertyValues<Select>) {
+  protected override async firstUpdated(changed: PropertyValues<BindableSelect<ItemType>>) {
     await this.menu?.updateComplete;
     // If this has been handled on update already due to SSR, try again.
     if (!this.lastSelectedOptionRecords.length) {
@@ -490,7 +504,7 @@ export abstract class Select extends selectBaseClass {
   }
 
   private renderMenuContent() {
-    return html`<slot></slot>`;
+    return html`<slot>${repeat(this.data, (item) => item, (item, index) => this.itemToListItem(item))}</slot>`;
   }
 
   /**
@@ -611,7 +625,7 @@ export abstract class Select extends selectBaseClass {
       hasSelectedOptionChanged = this.lastSelectedOption !== null;
       this.lastSelectedOption = null;
       this[VALUE] = '';
-      this.displayText = '';
+      //this.displayText = '';
     }
 
     return hasSelectedOptionChanged;
